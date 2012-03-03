@@ -8,14 +8,15 @@ module Hydrant
     context "integration" do
       before(:all) do
         $stderr.reopen("/dev/null", "w")
+        felix_params = {
+          :felix_home => File.expand_path("#{File.dirname(__FILE__)}/../../felix"),
+	  :felix_port => '8080',
+          :startup_wait => 60
+        }
+        Felixwrapper.configure(felix_params) 
       end
       
       it "starts" do
-        felix_params = {
-          :felix_home => File.expand_path("#{File.dirname(__FILE__)}/../../felix"),
-          :startup_wait => 30
-        }
-        Felixwrapper.configure(felix_params) 
         ts = Felixwrapper.instance
         ts.logger.debug "Stopping felix from rspec."
         ts.stop
@@ -26,50 +27,38 @@ module Hydrant
       
         # Can we connect to matterhorn?
         require 'net/http' 
-        response = Net::HTTP.get_response(URI.parse("http://localhost:8080/login.html"))
+        response = Net::HTTP.get_response(URI.parse("http://localhost:#{ts.port}/login.html"))
         response.code.should eql("200")
         ts.stop
       
       end
       
       it "won't start if it's already running" do
-        felix_params = {
-          :felix_home => File.expand_path("#{File.dirname(__FILE__)}/../../felix"),
-          :startup_wait => 30
-        }
-        Felixwrapper.configure(felix_params) 
         ts = Felixwrapper.instance
         ts.logger.debug "Stopping felix from rspec."
         ts.stop
         ts.start
         ts.logger.debug "Felix started from rspec at #{ts.pid}"
-        response = Net::HTTP.get_response(URI.parse("http://localhost:8080/login.html"))
+        response = Net::HTTP.get_response(URI.parse("http://localhost:#{ts.port}/login.html"))
         response.code.should eql("200")
         lambda { ts.start }.should raise_exception(/Server is already running/)
         ts.stop
       end
       
       it "can check to see whether a port is already in use" do
-        params = {
-          :felix_home => File.expand_path("#{File.dirname(__FILE__)}/../../felix"),
-          :felix_port => '9999',
-          :startup_wait => 30
-        }
-        Felixwrapper.stop(params) 
-        sleep 10
-        Felixwrapper.is_port_in_use?(params[:felix_port]).should eql(false)
-        Felixwrapper.start(params) 
-        Felixwrapper.is_port_in_use?(params[:felix_port]).should eql(true)
-        Felixwrapper.stop(params) 
+        ts = Felixwrapper.instance
+        ts.logger.debug "Stopping felix from rspec."
+        ts.stop
+	sleep 30
+	#FIXME following test fails inexplicably!!!
+        Felixwrapper.is_port_in_use?(ts.port).should eql(false)
+	ts.start
+        Felixwrapper.is_port_in_use?(ts.port).should eql(true)
+	ts.stop
       end
       
       it "raises an error if you try to start a felix that is already running" do
-        felix_params = {
-          :felix_home => File.expand_path("#{File.dirname(__FILE__)}/../../felix"),
-          :felix_port => '8080',
-          :startup_wait => 30
-        }
-        ts = Felixwrapper.configure(felix_params) 
+        ts = Felixwrapper.instance
         ts.stop
         ts.pid_file?.should eql(false)
         ts.start

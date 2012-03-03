@@ -11,7 +11,7 @@ require 'rubygems'
         :felix_home => "/path/to/felix",
         :felix_port => 8080,
         :startup_wait => 0,
-        :java_opts => ["-Xms1024m -Xmx1024m -XX:MaxPermSize=256m"]
+        :java_opts => ["-Xms1024m", "-Xmx1024m", "-XX:MaxPermSize=256m"]
       }
     end
 
@@ -80,8 +80,9 @@ require 'rubygems'
       it "passes all the expected values to felix during startup" do
         ts = Felixwrapper.configure(@felix_params) 
         command = ts.felix_command
-        command.should include("-Dfelix.port=#{@felix_params[:felix_port]}")
-        command.should include("-Xmx256mb")
+#        command.should include("-Dfelix.port=#{@felix_params[:felix_port]}")
+#        command.should include("-Xmx1024m")
+	command.should include("bin/start_matterhorn.sh")
       end
 
       it "has a pid if it has been started" do

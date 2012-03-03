@@ -7,6 +7,7 @@ require 'socket'
 require 'timeout'
 require 'childprocess'
 require 'active_support/core_ext/hash'
+require 'net/http'
 
 Dir[File.expand_path(File.join(File.dirname(__FILE__),"tasks/*.rake"))].each { |ext| load ext } if defined?(Rake)
 
@@ -80,6 +81,7 @@ class Felixwrapper
        raise "You must set either Rails.root, APP_ROOT or pass :felix_home as a parameter so I know where felix is" unless params[:felix_home]
       end
       felix_server.felix_home = params[:felix_home] || File.expand_path(File.join(base_path, 'felix'))
+      ENV['FELIX_HOME'] = felix_server.felix_home
       felix_server.port = params[:felix_port] || 8080
       felix_server.startup_wait = params[:startup_wait] || 5
       felix_server.java_opts = params[:java_opts] || []
@@ -203,12 +205,33 @@ class Felixwrapper
       end
     end
     
+    def is_responding?(port)
+      begin
+        Timeout::timeout(1) do
+          begin
+            response = Net::HTTP.get_response(URI.parse("http://localhost:#{port}/login.html"))
+            return true if "200" == response.code
+          rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH
+            return false
+          rescue
+            return false
+          end
+        end
+      rescue Timeout::Error
+      end
+
+      return false
+    end
+          
+
     end #end of class << self
     
         
    # What command is being run to invoke felix? 
    def felix_command
-     ["java", java_variables, java_opts, "-jar", "start.jar"].flatten
+#     ["java", java_variables, java_opts, "-jar", "bin/felix.jar"].flatten
+#FIXME replace the following line with a fully configured call to java to start felix
+     ["bin/start_matterhorn.sh"].flatten
    end
 
    def java_variables
@@ -261,7 +284,7 @@ class Felixwrapper
    def startup_wait!
      begin
      Timeout::timeout(startup_wait) do
-       sleep 1 until (Felixwrapper.is_port_in_use? self.port)
+       sleep 1 until (Felixwrapper.is_port_in_use? self.port and Felixwrapper.is_responding? self.port)
      end 
      rescue Timeout::Error
        logger.warn "Waited #{startup_wait} seconds for felix to start, but it is not yet listening on port #{self.port}. Continuing anyway."
