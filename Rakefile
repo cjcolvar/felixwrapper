@@ -9,6 +9,8 @@ require "felixwrapper"
 Bundler::GemHelper.install_tasks
 Dir.glob('tasks/*.rake').each { |r| import r }
 
+APP_ROOT= File.expand_path(File.join(File.dirname(__FILE__),"."))
+
 begin
   Bundler.setup(:default, :development)
 rescue Bundler::BundlerError => e

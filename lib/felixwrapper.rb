@@ -233,6 +233,11 @@ class Felixwrapper
      ["bin/start_matterhorn.sh"].flatten
    end
 
+   def felix_stop_command
+#FIXME replace the following line with a fully configured call to java to stop felix
+     ["bin/shutdown_matterhorn.sh"].flatten
+   end
+
    def java_variables
      ["-Dfelix.port=#{@port}"]
    end
@@ -309,6 +314,23 @@ class Felixwrapper
    def reset_process!
      @process = nil
    end
+
+   def stop_process
+     @stop_process ||= begin
+        stop_process = ChildProcess.build(*felix_stop_command)
+        if self.quiet
+          stop_process.io.stderr = File.open(File.expand_path("felixwrapper.log"), "w+")
+          stop_process.io.stdout = process.io.stderr
+          # logger.warn "Logging felixwrapper stdout to #{File.expand_path(process.io.stderr.path)}"
+        else
+          stop_process.io.inherit!
+        end
+        stop_process.detach = true
+
+        stop_process
+      end
+   end
+
    # Instance stop method. Must be called on Felixwrapper.instance
    # You're probably better off using Felixwrapper.stop(:felix_home => "/path/to/felix")
    # @example
@@ -323,6 +345,10 @@ class Felixwrapper
        else
          Process.kill("KILL", pid) rescue nil
        end
+
+     Dir.chdir(@felix_home) do
+       stop_process.start
+     end
 
        begin
          File.delete(pid_path)
