@@ -1,11 +1,13 @@
-require 'rake'
+require 'rubygems'
 require 'bundler'
+require "bundler/setup"
+require 'rake'
 require 'spec/rake/spectask'
 require 'yard'
+require "felixwrapper"
 
 Bundler::GemHelper.install_tasks
 Dir.glob('tasks/*.rake').each { |r| import r }
-
 
 begin
   Bundler.setup(:default, :development)
