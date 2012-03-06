@@ -1,11 +1,11 @@
 # -*- encoding: utf-8 -*-
 $:.push File.expand_path("../lib", __FILE__)
-require "felixwrapper/version"
+require "felixwrapper"
 require 'bundler'
 
 Gem::Specification.new do |s|
   s.name        = "felixwrapper"
-  s.version     = GEMVERSION
+  s.version     = Felixwrapper.version
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Chris Colvard"]
   s.email       = ["cjcolvar@indiana.edu"]
