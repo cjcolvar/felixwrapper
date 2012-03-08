@@ -11,7 +11,7 @@ module Hydrant
         felix_params = {
           :felix_home => File.expand_path("#{File.dirname(__FILE__)}/../../felix"),
 	  :felix_port => '8080',
-          :startup_wait => 60
+          :startup_wait => 300
         }
         Felixwrapper.configure(felix_params) 
       end
