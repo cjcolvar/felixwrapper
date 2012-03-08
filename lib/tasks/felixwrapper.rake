@@ -5,7 +5,15 @@ namespace :felix do
   
   desc "Return the status of felix"
   task :status => :environment do
-    status = Felixwrapper.is_felix_running?(FELIX_CONFIG) ? "Running: #{Felixwrapper.pid(FELIX_CONFIG)}" : "Not running"
+    running = Felixwrapper.is_felix_running?(FELIX_CONFIG)
+    responding = Felixwrapper.is_felix_responding?(FELIX_CONFIG) unless !running
+    if running and responding
+        status = "Running: #{Felixwrapper.pid(FELIX_CONFIG)}"
+    elsif running
+        status = "Running: #{Felixwrapper.pid(FELIX_CONFIG)} ... but not yet responding"
+    else
+        status = "Not running"
+    end
     puts status
   end
   

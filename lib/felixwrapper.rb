@@ -163,6 +163,16 @@ class Felixwrapper
       true
     end
     
+    # Determine whether the felix at the given felix_home is responding
+    # @param [Hash] params: :felix_home is required. Which felix do you want to check the status of?
+    # @return [Boolean]
+    # @example
+    #    Felixwrapper.is_felix_responding?(:felix_home => '/path/to/felix')
+    def is_felix_responding?(params)      
+      Felixwrapper.configure(params)
+      return Felixwrapper.is_responding?(Felixwrapper.instance.port)
+    end
+    
     # Return the pid of the specified felix, or return nil if it isn't running
     # @param [Hash] params: :felix_home is required.
     # @return [Fixnum] or [nil]
