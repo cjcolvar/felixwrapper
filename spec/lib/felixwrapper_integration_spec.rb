@@ -10,8 +10,7 @@ module Hydrant
         $stderr.reopen("/dev/null", "w")
         felix_params = {
           :felix_home => File.expand_path("#{File.dirname(__FILE__)}/../../felix"),
-	  :felix_port => '8080',
-          :startup_wait => 300
+	  :felix_port => '8080'
         }
         Felixwrapper.configure(felix_params) 
       end

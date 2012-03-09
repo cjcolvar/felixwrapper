@@ -86,7 +86,7 @@ class Felixwrapper
       felix_server.felix_home = params[:felix_home] || File.expand_path(File.join(base_path, 'felix'))
       ENV['FELIX_HOME'] = felix_server.felix_home
       felix_server.port = params[:felix_port] || 8080
-      felix_server.startup_wait = params[:startup_wait] || 5
+      felix_server.startup_wait = params[:startup_wait] || 60
       felix_server.java_opts = params[:java_opts] || []
       return felix_server
     end

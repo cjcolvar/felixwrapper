@@ -74,7 +74,7 @@ require 'rubygems'
         ts.quiet.should == true
         ts.felix_home.should == "/path/to/felix"
         ts.port.should == 8080
-        ts.startup_wait.should == 5
+        ts.startup_wait.should == 60
       end
       
       it "passes all the expected values to felix during startup" do

@@ -1,6 +1,5 @@
 default:
   felix_port: 8080
-  starup_wait: 300
   java_opts:
     - "-Xms1024m"
     - "-Xmx1024m"
