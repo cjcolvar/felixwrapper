@@ -22,7 +22,6 @@ class Felixwrapper
   attr_accessor :quiet        # Keep quiet about felix output?
   attr_accessor :base_path    # The root of the application. Used for determining where log files and PID files should go.
   attr_accessor :java_opts    # Options to pass to java (ex. ["-Xmx512mb", "-Xms128mb"])
-  attr_accessor :port         # The port felix should listen on
   
   # configure the singleton with some defaults
   def initialize(params = {})
@@ -279,10 +278,12 @@ class Felixwrapper
          logger.warn "Removing stale PID file at #{pid_path}"
          File.delete(pid_path)
        end
-       if Felixwrapper.is_port_in_use?(self.port)
-         raise("Port #{self.port} is already in use.")
-       end
      end
+
+     if Felixwrapper.is_port_in_use?(self.port)
+       raise("Port #{self.port} is already in use.")
+     end
+
      Dir.chdir(@felix_home) do
        process.start
      end
